@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="https://unpkg.com/htmx.org@1.8.5"></script>
+        <meta charset="UTF-8">
+        <title>AI Pics</title>
+    </head>
+    <body>
+        <form >
+            <input type="text" name="msg" style="width:75vw; height: 5vh; font-size: 4vh; margin:3vw;"/>
+            <button hx-post="/pics" hx-target="#msg" hx-swap="afterend" >Send</button>
+        </form>
+        <p id="msg"></p>
+    </body>
+</html>
