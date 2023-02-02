@@ -2,12 +2,13 @@
 <html lang="en">
     <head>
         <script src="https://unpkg.com/htmx.org@1.8.5"></script>
+        <link href='/{{ url_for('static', filename='style.css') }}"' rel='stylesheet'>
         <meta charset="UTF-8">
         <title>AI Pics</title>
     </head>
     <body>
         <form >
-            <input type="text" name="msg" style="width:75vw; height: 5vh; font-size: 4vh; margin:3vw;"/>
+            <input type="text" name="msg">
             <button hx-post="/pics" hx-target="#msg" hx-swap="afterend" >Send</button>
         </form>
         <p id="msg"></p>

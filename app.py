@@ -1,10 +1,17 @@
+import requests
+import os
+
 from fastapi import FastAPI, Form, Request
 from fastapi.templating import Jinja2Templates
-import requests
+from fastapi.staticfiles import StaticFiles
+
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates/")
+
 API_KEYS = "I AM NOT GOING TO SHOW MY KEYS"
+API_KEYS = os.getenv("API_KEY")
 
 
 @app.post("/api")
@@ -44,6 +51,8 @@ def chat_post(request: Request, msg: str= Form(...)):
         "temperature": 0.7,
     }
     response = requests.post(openai_url, headers=headers, json=data)
+    if response.status_code != 200:
+        return "<h2>500: Invernal Server Error</h2>"
     result = "<br><b>User: </b>" + msg + "<br><br>"
     result += "<b>AI: </b>" + str(response.json().get("choices")[0]["text"]).replace("\n", "<br>")
     return result
