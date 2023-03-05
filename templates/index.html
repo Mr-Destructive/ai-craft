@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <script src="https://unpkg.com/htmx.org@1.8.5"></script>
-    <link href='/{{ url_for('static', filename='style.css') }}"' rel='stylesheet'>
     <meta charset="UTF-8">
     <title>Chat</title>
 </head>
@@ -12,7 +11,9 @@
     <button hx-post="/chat" hx-target="#msg" hx-swap="afterend">Send</button>
 </form>
 
-<p id="msg"></p>
+<p id="msg">
+    {{ result|safe }}
+</p>
 
 </body>
 </html>
