@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api": {
+      "runtime": "@vercel/python",
+      "memory": 1024,
+      "timeout": 30,
+      "environment": {
+        "APP_MODULE": "app:app"
+      }
+    }
+  }
+}
