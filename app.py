@@ -40,7 +40,7 @@ def chat_get(request: Request, q: str = Query(None, min_length=10)):
     if q:
         data = {
             "prompt": q,
-            "model": "text-davinci-003",
+            "model": "command-xlarge-nightly",
             "max_tokens": 800,
             "temperature": 0.7,
         }
@@ -52,7 +52,7 @@ def chat_get(request: Request, q: str = Query(None, min_length=10)):
         if response.status_code != 200:
             return "500: Invernal Server Error"
         result = "<br><b>User: </b>" + q + "<br><br>"
-        result += "<b>AI: </b>" + str(response.json().get("choices")[0]["text"]).replace("\n", "<br>")
+        result += "<b>AI: </b>" + str(response.json().get("generations")[0]["text"]).replace("\n", "<br>")
     else:
         result = "Type a question"
     return templates.TemplateResponse('index.html', context={'request': request, 'result': result})
@@ -67,7 +67,7 @@ def chat_post(request: Request,  msg: str= Form(...)):
 
     data = {
         "prompt": msg,
-        "model": "text-davinci-003",
+        "model": "command-xlarge-nightly",
         "max_tokens": 800,
         "temperature": 0.7,
     }
@@ -75,7 +75,7 @@ def chat_post(request: Request,  msg: str= Form(...)):
     if response.status_code != 200:
         return "<h2>500: Invernal Server Error</h2>"
     result = "<br><b>User: </b>" + msg + "<br><br>"
-    result += "<b>AI: </b>" + str(response.json().get("choices")[0]["text"]).replace("\n", "<br>")
+    result += "<b>AI: </b>" + str(response.json().get("generations")[0]["text"]).replace("\n", "<br>")
     return result
 
 @app.get("/pics")
