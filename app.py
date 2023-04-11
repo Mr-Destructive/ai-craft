@@ -1,16 +1,21 @@
-import requests
+import io
 import os
+
+import aiohttp
 from dotenv import load_dotenv
+from PIL import Image
+import requests
+from rembg import remove
 
 load_dotenv()
 
-from fastapi import FastAPI, Form, Request, Query 
+from fastapi import FastAPI, Form, Request, Query, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/output", StaticFiles(directory="output"), name="static")
 templates = Jinja2Templates(directory="templates/")
 
 API_KEYS = "I AM NOT GOING TO SHOW MY KEYS"
@@ -36,7 +41,7 @@ async def chat(prompt: dict):
 
 
 @app.get("/chat")
-def chat_get(request: Request, q: str = Query(None, min_length=10)):
+async def chat_get(request: Request, q: str = Query(None, min_length=10)):
     if q:
         data = {
             "prompt": q,
@@ -48,7 +53,10 @@ def chat_get(request: Request, q: str = Query(None, min_length=10)):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {API_KEYS}"
         }
-        response = requests.post(f"{COHERE_URL}generate", headers=headers, json=data)
+        async with aiohttp.ClientSession() as session:
+            async with session.post(f"{COHERE_URL}generate", headers=headers, json=data) as response:
+                response = await response.json()
+        #response = requests.post(f"{COHERE_URL}generate", headers=headers, json=data)
         if response.status_code != 200:
             return "500: Invernal Server Error"
         result = "<br><b>User: </b>" + q + "<br><br>"
@@ -59,7 +67,7 @@ def chat_get(request: Request, q: str = Query(None, min_length=10)):
 
 
 @app.post("/chat")
-def chat_post(request: Request,  msg: str= Form(...)):
+async def chat_post(request: Request,  msg: str= Form(...)):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {API_KEYS}"
@@ -71,12 +79,15 @@ def chat_post(request: Request,  msg: str= Form(...)):
         "max_tokens": 800,
         "temperature": 0.7,
     }
-    response = requests.post(f"{COHERE_URL}generate", headers=headers, json=data)
-    if response.status_code != 200:
-        return "<h2>500: Invernal Server Error</h2>"
-    result = "<br><b>User: </b>" + msg + "<br><br>"
-    result += "<b>AI: </b>" + str(response.json().get("generations")[0]["text"]).replace("\n", "<br>")
-    return result
+    #response = requests.post(f"{COHERE_URL}generate", headers=headers, json=data)
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{COHERE_URL}generate", headers=headers, json=data) as response:
+            response = await response.json()
+            if not response.get('generations'):
+                return "<h2>500: Invernal Server Error</h2>"
+            result = "<br><b>User: </b>" + msg + "<br><br>"
+            result += "<b>AI: </b>" + str(response.get("generations")[0]["text"]).replace("\n", "<br>")
+            return result
 
 @app.get("/pics")
 def pics_get(request: Request):
@@ -100,3 +111,21 @@ def pics_post(request: Request, msg: str= Form(...)):
     for image in response.json().get("data"):
         result += f"<img src=\'{image.get('url')}\'>"
     return result
+
+
+@app.get("/rmbg")
+async def rmbg_form(request: Request):
+    return templates.TemplateResponse('rmbg.html', context={'request': request})
+
+
+@app.post("/rmbg")
+async def rmbg_img(request: Request, image: UploadFile = File(...)):
+    img = Image.open(io.BytesIO(await image.read()))
+    output = remove(img)
+    if not img.filename:
+        filename = 'temp'
+    else:
+        filename = img.filename
+    output_file_path = "output/" + filename + '.png'
+    output.save(output_file_path)
+    return templates.TemplateResponse('rmbg_img.html', context={'request': request,'img_url': output_file_path})
