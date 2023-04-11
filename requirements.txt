@@ -1,6 +1,7 @@
 fastapi
 aiohttp
 requests
+jinja2
 #PILLOW
 python-dotenv
 #rembg
