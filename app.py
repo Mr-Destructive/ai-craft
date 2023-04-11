@@ -3,9 +3,9 @@ import os
 
 import aiohttp
 from dotenv import load_dotenv
-from PIL import Image
+#from PIL import Image
 import requests
-from rembg import remove
+#from rembg import remove
 
 load_dotenv()
 
@@ -89,43 +89,43 @@ async def chat_post(request: Request,  msg: str= Form(...)):
             result += "<b>AI: </b>" + str(response.get("generations")[0]["text"]).replace("\n", "<br>")
             return result
 
-@app.get("/pics")
-def pics_get(request: Request):
-    result = "Enter the prompt"
-    return templates.TemplateResponse('pics.html', context={'request': request, 'result': result})
-
-
-@app.post("/pics")
-def pics_post(request: Request, msg: str= Form(...)):
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {API_KEYS}"
-    }
-    data = {
-        "prompt": msg,
-        "n": 5,
-        "size": "256x256"
-    }
-    response = requests.post(f"{COHERE_URL}images/generations", headers=headers, json=data)
-    result = "<br><b>User: </b>" + msg + "<br><br>"
-    for image in response.json().get("data"):
-        result += f"<img src=\'{image.get('url')}\'>"
-    return result
-
-
-@app.get("/rmbg")
-async def rmbg_form(request: Request):
-    return templates.TemplateResponse('rmbg.html', context={'request': request})
-
-
-@app.post("/rmbg")
-async def rmbg_img(request: Request, image: UploadFile = File(...)):
-    img = Image.open(io.BytesIO(await image.read()))
-    output = remove(img)
-    if not img.filename:
-        filename = 'temp'
-    else:
-        filename = img.filename
-    output_file_path = "output/" + filename + '.png'
-    output.save(output_file_path)
-    return templates.TemplateResponse('rmbg_img.html', context={'request': request,'img_url': output_file_path})
+#@app.get("/pics")
+#def pics_get(request: Request):
+#    result = "Enter the prompt"
+#    return templates.TemplateResponse('pics.html', context={'request': request, 'result': result})
+#
+#
+#@app.post("/pics")
+#def pics_post(request: Request, msg: str= Form(...)):
+#    headers = {
+#        "Content-Type": "application/json",
+#        "Authorization": f"Bearer {API_KEYS}"
+#    }
+#    data = {
+#        "prompt": msg,
+#        "n": 5,
+#        "size": "256x256"
+#    }
+#    response = requests.post(f"{COHERE_URL}images/generations", headers=headers, json=data)
+#    result = "<br><b>User: </b>" + msg + "<br><br>"
+#    for image in response.json().get("data"):
+#        result += f"<img src=\'{image.get('url')}\'>"
+#    return result
+#
+#
+#@app.get("/rmbg")
+#async def rmbg_form(request: Request):
+#    return templates.TemplateResponse('rmbg.html', context={'request': request})
+#
+#
+#@app.post("/rmbg")
+#async def rmbg_img(request: Request, image: UploadFile = File(...)):
+#    img = Image.open(io.BytesIO(await image.read()))
+#    output = remove(img)
+#    if not img.filename:
+#        filename = 'temp'
+#    else:
+#        filename = img.filename
+#    output_file_path = "output/" + filename + '.png'
+#    output.save(output_file_path)
+#    return templates.TemplateResponse('rmbg_img.html', context={'request': request,'img_url': output_file_path})
