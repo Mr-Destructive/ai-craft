@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
-app.mount("/output", StaticFiles(directory="output"), name="static")
+app.mount("/output_imgs", StaticFiles(directory="output_imgs"), name="static")
 templates = Jinja2Templates(directory="templates/")
 
 API_KEYS = "I AM NOT GOING TO SHOW MY KEYS"
@@ -126,6 +126,6 @@ async def chat_post(request: Request,  msg: str= Form(...)):
 #        filename = 'temp'
 #    else:
 #        filename = img.filename
-#    output_file_path = "output/" + filename + '.png'
+#    output_file_path = "output_imgs/" + filename + '.png'
 #    output.save(output_file_path)
 #    return templates.TemplateResponse('rmbg_img.html', context={'request': request,'img_url': output_file_path})
