@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Youtube Video</title>
+</head>
+<body>
+
+<a href="{{ url|safe }}" download>Download Video</a>
+<video>
+    <source src="{{ url|safe }}" type="video/mp4">
+</video>
+
+</body>
+</html>

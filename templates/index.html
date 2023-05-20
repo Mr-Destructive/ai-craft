@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://unpkg.com/htmx.org@1.8.5"></script>
     <meta charset="UTF-8">
-    <title>Chat</title>
+    <title>AI Craft</title>
 </head>
 <body>
-<form >
-    <input type="text" name="msg"/>
-    <button hx-post="/chat" hx-target="#msg" hx-swap="afterend">Send</button>
-</form>
-
-<p id="msg">
-    {{ result|safe }}
-</p>
-
+    <ul>
+        {% for url in result %}
+        <li>
+            <a href={{ url }}>{{ url }}</a>
+        </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
